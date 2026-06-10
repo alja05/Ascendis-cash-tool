@@ -1,0 +1,65 @@
+{
+  "format": "v2-dual",
+  "models": {
+    "persistence": {
+      "intercept": 0.3169569334188,
+      "features": ["RD_Intensity", "Size", "ROA", "Cash_Ratio"],
+      "coefficients": {
+        "RD_Intensity": 0.00917401618388,
+        "Size": -0.005554596474875,
+        "ROA": -0.004262665839097,
+        "Cash_Ratio": 0.133493176057
+      },
+      "train_means": {
+        "RD_Intensity": 1.626977881236,
+        "Size": 6.198131102529,
+        "ROA": -0.2196512629316,
+        "Cash_Ratio": 0.3381527915565
+      },
+      "train_sds": {
+        "RD_Intensity": 1.964524389491,
+        "Size": 1.122821955852,
+        "ROA": 0.2891634470225,
+        "Cash_Ratio": 0.2254936588184
+      },
+      "label": "Lasso (lambda.1se) incl. Cash_Ratio_t"
+    },
+    "structural": {
+      "intercept": 0.3169569334188,
+      "features": ["Cash_Equiv", "ST_Investments", "log_Revenue", "log_Total_Assets", "log_Num_Employees", "RD_Intensity", "Leverage", "Size"],
+      "coefficients": {
+        "Cash_Equiv": 0.05538278696265,
+        "ST_Investments": -0.008060403098007,
+        "log_Revenue": -0.0196907149727,
+        "log_Total_Assets": -0.04967717759737,
+        "log_Num_Employees": -0.01031456919915,
+        "RD_Intensity": 0.01278784517599,
+        "Leverage": 0.007708200190374,
+        "Size": -0.001371326008625
+      },
+      "train_means": {
+        "Cash_Equiv": 244.092701380145,
+        "ST_Investments": 215.708535883777,
+        "log_Revenue": 4.830227417332,
+        "log_Total_Assets": 6.20229907491,
+        "log_Num_Employees": 5.779639910973,
+        "RD_Intensity": 1.626977881236,
+        "Leverage": 0.3618298016374,
+        "Size": 6.198131102529
+      },
+      "train_sds": {
+        "Cash_Equiv": 338.003889996641,
+        "ST_Investments": 317.06143800246,
+        "log_Revenue": 1.439126487671,
+        "log_Total_Assets": 1.116716738458,
+        "log_Num_Employees": 0.9900497923657,
+        "RD_Intensity": 1.964524389491,
+        "Leverage": 0.5472314247044,
+        "Size": 1.122821955852
+      },
+      "label": "Lasso (lambda.1se) excl. Cash_Ratio_t (paper primary)"
+    }
+  },
+  "peer_median": 0.2077684300672,
+  "fx_default": 1.0354
+}
