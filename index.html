@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ascendis Cash Tool</title>
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,400&family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#072746;--navy2:#0d3a66;--blue:#1668bd;--blue-d:#0f4f93;--aqua:#1ab5cc;
+  --ink:#102536;--muted:#5d6f80;--line:#e4ebf2;--card:#fff;--pos:#1d8a5b;--neg:#c2492f;
+  --mist:#eef3f8;--ease:cubic-bezier(.22,.61,.36,1);
+  --sans:'Libre Franklin',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --serif:'Fraunces',Georgia,serif;color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);color:var(--ink);min-height:100vh;
+  background:radial-gradient(900px 520px at 10% -10%,rgba(26,181,204,.13),transparent 60%),
+    radial-gradient(950px 600px at 112% 8%,rgba(22,104,189,.13),transparent 55%),
+    linear-gradient(180deg,#eef3f8 0%,#e6eef7 100%);background-attachment:fixed}
+.wrap{max-width:1440px;margin:0 auto;padding:24px clamp(16px,3vw,52px) 56px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+#gate{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--navy),var(--navy2))}
+#gate .panel{background:rgba(255,255,255,.97);border-radius:20px;padding:38px 40px;width:min(380px,90vw);
+  box-shadow:0 30px 70px -30px rgba(0,0,0,.6);text-align:center;animation:fadeUp .5s var(--ease) both}
+#gate .mark{width:56px;height:56px;border-radius:16px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,var(--aqua),var(--blue));color:#fff;font-family:var(--serif);font-size:30px;font-weight:600}
+#gate h1{font-size:19px;font-weight:700;margin-bottom:4px}
+#gate p{font-size:12.5px;color:var(--muted);margin-bottom:18px}
+#gate input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:11px;font-size:14px;font-family:var(--sans)}
+#gate input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(22,104,189,.13)}
+#gate button{width:100%;margin-top:12px;padding:13px;border:none;border-radius:11px;cursor:pointer;font-weight:600;font-size:14px;
+  color:#fff;background:linear-gradient(120deg,var(--blue),var(--blue-d));font-family:var(--sans);
+  transition:transform .12s var(--ease),box-shadow .15s}
+#gate button:hover{transform:translateY(-1px);box-shadow:0 14px 26px -12px rgba(15,79,147,.9)}
+#gate .err{color:var(--neg);font-size:12px;margin-top:10px;min-height:15px}
+
+header.hero{background:linear-gradient(118deg,var(--navy) 0%,var(--navy2) 55%,var(--blue-d) 100%);
+  border-radius:22px;padding:32px 36px;position:relative;overflow:hidden;color:#fff;
+  box-shadow:0 26px 56px -28px rgba(7,39,70,.92);animation:fadeUp .6s var(--ease) both}
+header.hero::after{content:"";position:absolute;right:-70px;top:-70px;width:300px;height:300px;
+  background:radial-gradient(circle,rgba(26,181,204,.4),transparent 70%)}
+.hero-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;position:relative;z-index:1}
+.hero .mark{width:52px;height:52px;border-radius:15px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+  background:linear-gradient(145deg,var(--aqua),var(--blue));font-family:var(--serif);font-weight:600;font-size:29px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.3),0 10px 22px -9px rgba(0,0,0,.55)}
+.hero h1{font-size:24px;font-weight:700;line-height:1.1}
+.hero .sub{font-size:13px;color:#bcd3ea;margin-top:4px;letter-spacing:.3px}
+.hero-right{margin-left:auto;text-align:right}
+.hero .brand{font-size:13px;font-weight:600;letter-spacing:3.2px;text-transform:uppercase;color:#dce8f5}
+.hero .tag{font-family:var(--serif);font-style:italic;font-size:13.5px;color:#9fc0e0;margin-top:2px}
+.hero .rule{height:3px;margin-top:22px;border-radius:3px;background:linear-gradient(90deg,var(--aqua),transparent 70%);position:relative;z-index:1}
+.hero .live{display:inline-flex;align-items:center;gap:7px;margin-top:14px;font-size:11px;font-weight:600;letter-spacing:.6px;
+  text-transform:uppercase;color:#9fe8f2;position:relative;z-index:1}
+.hero .live i{width:7px;height:7px;border-radius:50%;background:var(--aqua);box-shadow:0 0 10px var(--aqua);animation:pulse 2.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+.main{display:grid;grid-template-columns:336px 1fr;gap:24px;margin-top:20px;align-items:start}
+@media(max-width:960px){.main{grid-template-columns:1fr}}
+.card{background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 14px 38px -28px rgba(16,37,54,.65)}
+aside.card{padding:22px;position:sticky;top:18px;animation:fadeUp .6s .06s var(--ease) both}
+@media(max-width:960px){aside.card{position:static}}
+.ptitle{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue-d);margin-bottom:6px}
+.pnote{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:6px}
+
+/* collapsible groups */
+.sect{border-top:1px solid var(--line);margin-top:12px;padding-top:4px}
+.sect:first-of-type{border-top:none;margin-top:8px}
+.sect>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 2px;
+  font-size:10.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:#5b7governmenta;color:#5b7a92}
+.sect>summary::-webkit-details-marker{display:none}
+.sect>summary .chev{margin-left:auto;width:16px;height:16px;flex:0 0 auto;transition:transform .25s var(--ease);color:#9aabbb}
+.sect[open]>summary .chev{transform:rotate(90deg)}
+.sect>summary .badge{font-size:9px;font-weight:600;letter-spacing:.3px;color:#8aa0b5;background:var(--mist);
+  padding:2px 7px;border-radius:999px;text-transform:none}
+.sect .body{padding:2px 0 6px;animation:fadeUp .3s var(--ease) both}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:12px;font-weight:600;color:#33485c;margin-bottom:5px}
+.field input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:11px;font-size:13.5px;
+  font-family:var(--sans);font-variant-numeric:tabular-nums;background:#fff;color:var(--ink);
+  transition:border-color .15s var(--ease),box-shadow .15s var(--ease)}
+.field input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(22,104,189,.13)}
+.field.dual{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field.dual>div label{font-size:11px}
+.aside-links{display:flex;gap:14px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-size:11.5px;flex-wrap:wrap}
+.aside-links a{color:var(--blue-d);font-weight:600;cursor:pointer;text-decoration:none;border-bottom:1px dotted #9bb0c4}
+.aside-links a:hover{color:var(--blue)}
+
+.tabbar{display:inline-flex;gap:4px;background:rgba(255,255,255,.7);backdrop-filter:blur(8px);border-radius:13px;padding:4px;
+  box-shadow:0 6px 18px -14px rgba(16,37,54,.5);margin-bottom:12px;flex-wrap:wrap;animation:fadeUp .6s .08s var(--ease) both}
+.tabbar button{border:none;background:transparent;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--muted);
+  padding:9px 16px;border-radius:10px;cursor:pointer;transition:all .22s var(--ease)}
+.tabbar button:hover{color:var(--blue-d)}
+.tabbar button.on{color:#fff;background:linear-gradient(120deg,var(--blue),var(--blue-d));box-shadow:0 8px 18px -10px rgba(15,79,147,.9)}
+.pane{display:none;padding:26px;min-height:480px;animation:fadeUp .35s var(--ease) both}
+.pane.on{display:block}
+
+.kpis{display:flex;gap:14px;flex-wrap:wrap}
+.kpi{flex:1;min-width:160px;background:#f7fafd;border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;
+  transition:transform .16s var(--ease),box-shadow .16s var(--ease)}
+.kpi:hover{transform:translateY(-3px);box-shadow:0 18px 36px -22px rgba(16,37,54,.55)}
+.kpi.primary{background:linear-gradient(140deg,var(--navy),var(--blue-d));border:none;box-shadow:0 18px 38px -20px rgba(13,58,102,.92)}
+.kpi .lbl{font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--muted)}
+.kpi .val{font-size:37px;font-weight:700;margin-top:8px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.6px}
+.kpi .val .u{font-size:18px;font-weight:600;margin-left:2px;opacity:.82}
+.kpi .sub{font-size:11.5px;color:var(--muted);margin-top:8px}
+.kpi.primary .lbl{color:#bcd6ef}.kpi.primary .sub{color:#a7c6e4}
+.kpi.primary .val{color:#fff;font-family:var(--serif);font-weight:600;text-shadow:0 1px 10px rgba(0,0,0,.18)}
+.chip{display:inline-block;margin-top:10px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;
+  background:rgba(255,255,255,.16);color:#eaf2fb}
+.stitle{font-size:11px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--blue-d);margin:28px 0 12px}
+.chartcard{background:linear-gradient(180deg,#fbfdff,#f4f8fc);border:1px solid var(--line);border-radius:16px;padding:18px 18px 14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+.note{font-size:11.5px;color:var(--muted);line-height:1.6;margin-top:12px}
+.foot{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);line-height:1.6}
+.disclaimer{text-align:center;font-size:11px;color:#8496a6;margin-top:22px;line-height:1.5}
+.warnbox{background:#fff7e8;border:1px solid #f3d699;color:#7a591a;border-radius:13px;padding:16px 18px;font-size:13px;line-height:1.6}
+.warnbox b{display:block;margin-bottom:4px}
+
+.twrap{border:1px solid var(--line);border-radius:13px;background:#fff;box-shadow:0 7px 20px -17px rgba(16,37,54,.55)}
+table.t{width:100%;border-collapse:separate;border-spacing:0;font-size:12.8px}
+.t thead th{background:#eef5fc;color:var(--blue-d);text-transform:uppercase;font-size:10px;letter-spacing:.7px;font-weight:700;
+  padding:11px 14px;text-align:left;border-bottom:1px solid var(--line)}
+.t thead th:first-child{border-top-left-radius:13px}.t thead th:last-child{border-top-right-radius:13px}
+.t th.num{text-align:right}
+.t td{padding:10px 14px;border-top:1px solid #eef3f8;vertical-align:middle}
+.t tbody tr:first-child td{border-top:none}.t tbody tr:nth-child(even){background:#fafcfe}
+.t tbody tr{transition:background .14s var(--ease)}.t tbody tr:hover{background:#eef5fc}
+.t tbody tr:last-child td:first-child{border-bottom-left-radius:13px}
+.t tbody tr:last-child td:last-child{border-bottom-right-radius:13px}
+.t .num{text-align:right;font-variant-numeric:tabular-nums}
+.t .drv{font-weight:600;box-shadow:inset 3px 0 0 transparent;transition:box-shadow .14s var(--ease)}
+.t tbody tr:hover .drv{box-shadow:inset 3px 0 0 var(--aqua)}
+.t .dim{color:var(--muted)}.t .pct{color:var(--muted);font-size:11px}
+.tip{position:relative;cursor:help;border-bottom:1px dotted #9bb0c4}
+.tipbox{position:absolute;left:0;bottom:calc(100% + 9px);width:235px;background:var(--navy2);color:#eaf2fb;font-weight:500;
+  font-size:11.5px;line-height:1.45;padding:10px 12px;border-radius:11px;box-shadow:0 16px 32px -10px rgba(7,39,70,.75);
+  opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .18s var(--ease),transform .18s var(--ease);z-index:60}
+.tipbox::after{content:'';position:absolute;left:20px;top:100%;border:6px solid transparent;border-top-color:var(--navy2)}
+.tip:hover .tipbox{opacity:1;transform:translateY(0)}
+
+svg{width:100%;height:auto;display:block}
+.g-track{fill:none;stroke:#e7eef5;stroke-width:15;stroke-linecap:round}
+.g-val{fill:none;stroke:url(#ggrad);stroke-width:15;stroke-linecap:round;transition:stroke-dashoffset .7s var(--ease)}
+.g-dot{fill:var(--blue);stroke:#fff;stroke-width:2.5}
+.g-cur{stroke:#7d97b0;stroke-width:3;stroke-linecap:round}
+.g-peer{stroke:var(--pos);stroke-width:3;stroke-linecap:round;stroke-dasharray:2 2}
+.g-curlbl{fill:#7d97b0;font-size:9px;text-anchor:middle;font-weight:600}
+.g-peerlbl{fill:var(--pos);font-size:9px;text-anchor:middle;font-weight:600}
+.g-scale{fill:#9aa9b8;font-size:9.5px}
+.g-value{fill:var(--navy2);font-family:var(--serif);font-weight:600;font-size:32px;text-anchor:middle}
+.g-vlabel{fill:var(--muted);font-size:9px;text-anchor:middle;letter-spacing:.4px;text-transform:uppercase}
+.wf-grid{stroke:#e6edf4;stroke-width:1}
+.wf-gridlbl{fill:#aab8c6;font-size:9px;text-anchor:end}
+.wf-axis{stroke:#c2cedb;stroke-width:1.2}
+.wf-conn{stroke:#b9c6d4;stroke-width:1.2;stroke-dasharray:3 3}
+.wf-base{fill:var(--navy2)}.wf-final{fill:var(--blue)}.wf-pos{fill:var(--pos)}.wf-neg{fill:var(--neg)}
+.wf-bar{transition:y .55s var(--ease),height .55s var(--ease),x .55s var(--ease)}
+.wf-bar:hover{opacity:.85}
+.wf-val{font-size:10px;font-weight:700;text-anchor:middle;font-variant-numeric:tabular-nums}
+.wf-valpp{font-size:8px;font-weight:600;text-anchor:middle;fill:#8aa0b5}
+.wf-base-t,.wf-final-t{fill:var(--blue-d)}.wf-pos-t{fill:var(--pos)}.wf-neg-t{fill:var(--neg)}
+.wf-cat{font-size:9.5px;fill:var(--muted);text-anchor:middle;font-weight:600}
+.wf-unit{font-size:9.5px;fill:#9aa9b8;letter-spacing:.3px;text-transform:uppercase}
+.ff-band{fill:rgba(26,181,204,.10)}
+.ff-bandlbl{fill:#168ba0;font-size:10px;font-weight:700;text-anchor:middle;letter-spacing:.4px}
+.ff-grid{stroke:#e6edf4;stroke-width:1}
+.ff-axis{fill:#9aa9b8;font-size:10px;text-anchor:middle;font-variant-numeric:tabular-nums}
+.ff-axisunit{fill:#9aa9b8;font-size:9.5px;text-anchor:end;letter-spacing:.4px;text-transform:uppercase}
+.ff-lbl{fill:var(--ink);font-size:12.5px;font-weight:700;text-anchor:end}
+.ff-sub{fill:#8496a6;font-size:9.5px;text-anchor:end}
+.ff-bar.m1{fill:#7d97b0}.ff-bar.m2{fill:var(--navy2)}.ff-bar.ml{fill:#bcd9e8}
+.ff-tick{stroke:#5d6f80;stroke-width:2}.ff-tick.red{stroke:var(--neg);stroke-width:2.5}
+.ff-ticklbl{fill:#5d6f80;font-size:9px;text-anchor:middle;font-weight:600}.ff-ticklbl.red{fill:var(--neg)}
+.ff-diamond{fill:url(#ffgrad);stroke:#fff;stroke-width:1.5}
+.ff-val{fill:#33485c;font-size:10px;font-weight:700;text-anchor:middle;font-variant-numeric:tabular-nums}
+.ff-val.blue{fill:var(--blue-d)}
+.ff-rangelbl{fill:#5d6f80;font-size:9.5px;font-variant-numeric:tabular-nums}
+.ff-dot{fill:var(--blue);stroke:#fff;stroke-width:2.5;filter:drop-shadow(0 2px 4px rgba(22,104,189,.5))}
+.ff-current{stroke:var(--neg);stroke-width:2;stroke-dasharray:5 3}
+.ff-currentlbl{fill:var(--neg);font-size:10px;font-weight:700;text-anchor:middle}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:11px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="panel">
+    <div class="mark">A</div>
+    <h1>Ascendis Cash Tool</h1>
+    <p>Enter the access password to continue.</p>
+    <input id="pw" type="password" placeholder="Password" autocomplete="off">
+    <button id="pwbtn">Sign in</button>
+    <div class="err" id="pwerr"></div>
+  </div>
+</div>
+
+<div class="wrap" id="app" style="visibility:hidden">
+  <header class="hero">
+    <div class="hero-row">
+      <div class="mark">A</div>
+      <div>
+        <h1>Ascendis Cash Tool</h1>
+        <div class="sub">Peer-implied benchmarking &amp; method triangulation &middot; Lasso (&lambda;.1se) &middot; EUR inputs</div>
+      </div>
+      <div class="hero-right">
+        <div class="brand">Ascendis</div>
+        <div class="tag">Patients. Science. Passion.</div>
+      </div>
+    </div>
+    <div class="live"><i></i>Live &mdash; results update as you type</div>
+    <div class="rule"></div>
+  </header>
+
+  <div class="main">
+    <aside class="card">
+      <div class="ptitle">Inputs &middot; EUR millions</div>
+      <div class="pnote">Enter plain, unstandardised figures. The four core drivers feed both models; the extra
+        fields feed only the structural model. Everything converts to USD and standardises internally.</div>
+      <div id="fields"></div>
+      <div class="aside-links">
+        <a id="resetBtn">Reset to paper reference case</a>
+      </div>
+    </aside>
+
+    <section>
+      <div class="tabbar" role="tablist">
+        <button class="on" data-pane="p1" role="tab">Persistence model</button>
+        <button data-pane="p2" role="tab">Structural model</button>
+        <button data-pane="p3" role="tab">Method triangulation</button>
+      </div>
+      <div class="card pane on" id="p1"></div>
+      <div class="card pane" id="p2"></div>
+      <div class="card pane" id="p3"></div>
+    </section>
+  </div>
+
+  <div class="disclaimer">Internal analytical tool. Peer-implied estimates from Lasso models fitted to a biopharma
+    peer panel; Method 1/2 figures from the accompanying Business Project. Not investment advice or a target set by
+    Ascendis Pharma. Ascendis-inspired styling for academic use.</div>
+</div>
+
+<script>
+"use strict";
+/* ════════════════════════════════════════════════════════════════════
+   Model parameters — Model A, Lasso (lambda.1se).
+   PERSISTENCE: 4-feature spec incl. Cash_Ratio. Coefficients transcribed
+     from the R output; standardisation recomputed from the source CSV and
+     verified to reproduce R exactly (38.5% on the 2025 inputs).
+   STRUCTURAL: the re-estimated 8-feature spec excl. Cash_Ratio
+     (lasso_no_cr_cv) behind Table 6 — coefficients/means/sds copied from
+     the exported model_params.json. Verified to reproduce 30.4% / 609.3.
+   Cash holding follows the paper's Table 6 basis:
+       holding = predicted ratio x FORECAST-YEAR total assets.
+   ════════════════════════════════════════════════════════════════════ */
+const PERSISTENCE = {
+  label: "Lasso (\u03bb.1se) incl. Cash_Ratio\u209c \u2014 persistence specification",
+  intercept: 0.3169569334188,
+  features: ["RD_Intensity","Size","ROA","Cash_Ratio"],
+  coefficients:{RD_Intensity:0.00917401618388, Size:-0.005554596474875, ROA:-0.004262665839097, Cash_Ratio:0.133493176057},
+  train_means:{RD_Intensity:1.626977881236, Size:6.198131102529, ROA:-0.2196512629316, Cash_Ratio:0.3381527915565},
+  train_sds:{RD_Intensity:1.964524389491, Size:1.122821955852, ROA:0.2891634470225, Cash_Ratio:0.2254936588184}
+};
+const STRUCTURAL = {
+  label: "Lasso (\u03bb.1se) re-estimated excl. Cash_Ratio\u209c \u2014 structural specification (Table 6)",
+  intercept: 0.3169569334188,
+  features:["Cash_Equiv","ST_Investments","log_Revenue","log_Total_Assets","log_Num_Employees","RD_Intensity","Leverage","Size"],
+  coefficients:{Cash_Equiv:0.05538278696265, ST_Investments:-0.008060403098007, log_Revenue:-0.0196907149727,
+    log_Total_Assets:-0.04967717759737, log_Num_Employees:-0.01031456919915, RD_Intensity:0.01278784517599,
+    Leverage:0.007708200190374, Size:-0.001371326008625},
+  train_means:{Cash_Equiv:244.092701380145, ST_Investments:215.708535883777, log_Revenue:4.830227417332,
+    log_Total_Assets:6.20229907491, log_Num_Employees:5.779639910973, RD_Intensity:1.626977881236,
+    Leverage:0.3618298016374, Size:6.198131102529},
+  train_sds:{Cash_Equiv:338.003889996641, ST_Investments:317.06143800246, log_Revenue:1.439126487671,
+    log_Total_Assets:1.116716738458, log_Num_Employees:0.9900497923657, RD_Intensity:1.964524389491,
+    Leverage:0.5472314247044, Size:1.122821955852}
+};
+
+const PEER_MEDIAN = 0.2077684300672;
+const METHOD1 = {floor:370, lo:430, hi:500, ceiling:740};
+const METHOD2 = {target:467, lean:361, conservative:892, ye:389};
+const ML_REF  = {struct:{ci:[581.0,727.2]}, pers:{ci:[737.0,804.2]}};
+const COMBINED = [430,610];
+
+const LABELS={RD_Intensity:"R&D Intensity", Size:"Size", ROA:"Return on Assets", Cash_Ratio:"Cash Ratio (current)",
+  Cash_Equiv:"Cash & Equivalents", ST_Investments:"ST Investments", log_Revenue:"log Revenue",
+  log_Total_Assets:"log Total Assets", log_Num_Employees:"log Employees", Leverage:"Leverage"};
+const SHORT={RD_Intensity:"R&D Int.", Size:"Size", ROA:"ROA", Cash_Ratio:"Cash Ratio",
+  Cash_Equiv:"Cash", ST_Investments:"ST Inv.", log_Revenue:"log Rev.", log_Total_Assets:"log TA",
+  log_Num_Employees:"log Emp.", Leverage:"Leverage"};
+const FORMULAS={RD_Intensity:"R&D / Revenue", Size:"ln(Total Assets, USD m)", ROA:"Net Income / Total Assets",
+  Cash_Ratio:"Cash / Total Assets", Cash_Equiv:"Cash level, USD m", ST_Investments:"ST investments, USD m",
+  log_Revenue:"ln(1 + |Revenue|)", log_Total_Assets:"ln(1 + Total Assets)", log_Num_Employees:"ln(1 + headcount)",
+  Leverage:"(Total Debt + Convertible) / Total Assets"};
+const TIPS={
+  RD_Intensity:"R&D spend relative to revenue. Enters positively: research-intensive firms hold larger precautionary buffers.",
+  Size:"Natural log of total assets (USD m). Larger firms enjoy scale economies in cash management.",
+  ROA:"Net income over total assets. Less profitable firms hold proportionally more cash.",
+  Cash_Ratio:"Current cash over total assets \u2014 the persistence term, the dominant driver (~73% of explained variance).",
+  Cash_Equiv:"Raw cash level (USD m). With the cash ratio removed, the structural refit leans on the level itself.",
+  ST_Investments:"Short-term investments (USD m) \u2014 near-cash liquidity outside cash and equivalents.",
+  log_Revenue:"Log of revenue \u2014 a scale measure of commercial maturity.",
+  log_Total_Assets:"Log(1 + total assets) \u2014 a second size transform alongside Size.",
+  log_Num_Employees:"Log of headcount \u2014 an organisational-scale proxy.",
+  Leverage:"Total debt plus convertible notes over total assets, as defined in the peer panel.",
+  Baseline:"The model intercept: the predicted cash ratio for a firm at the training-set average on every driver."};
+const PCT=new Set(["RD_Intensity","ROA","Cash_Ratio","Leverage"]);
+
+/* Inputs grouped; 'open' controls whether the section starts expanded. */
+const GROUPS=[
+  {title:"Core drivers", note:"feed both models", open:true, fields:[
+    {id:"ta",   label:"Total Assets \u2014 feature year (EUR m)", def:1302.570},
+    {id:"cash", label:"Cash & Equivalents (EUR m)",               def:616.041},
+    {id:"rev",  label:"Revenue (EUR m)",                          def:720.132},
+    {id:"rd",   label:"R&D Expense (EUR m)",                      def:303.621},
+    {id:"ni",   label:"Net Income (EUR m)",                       def:-228.034},
+  ]},
+  {title:"Structural model only", note:"4 extra fields", open:true, fields:[
+    {id:"stinv",label:"Short-term Investments (EUR m)", def:0},
+    {id:"emp",  label:"Employees (headcount)",          def:1189},
+    {id:"debt", label:"Total Debt (EUR m)", def:871.786, dualWith:"conv"},
+    {id:"conv", label:"Convertible Notes (EUR m)", def:429.391},
+  ]},
+  {title:"Forecast basis", note:"", open:true, fields:[
+    {id:"taf",  label:"Total Assets \u2014 forecast year (EUR m)", def:2003.279, dualWith:"fx"},
+    {id:"fx",   label:"FX (USD per EUR)", def:1.0354},
+  ]},
+];
+const INPUTS = GROUPS.flatMap(g=>g.fields);
+
+function deriveFeatures(v){
+  const fx=v.fx, ta=v.ta*fx, cash=v.cash*fx, rev=v.rev*fx, rd=v.rd*fx, ni=v.ni*fx,
+        st=v.stinv*fx, debt=v.debt*fx, conv=v.conv*fx, emp=Math.max(v.emp,0);
+  return {RD_Intensity:rd/rev, Size:Math.log(ta), ROA:ni/ta, Cash_Ratio:cash/ta,
+          Cash_Equiv:cash, ST_Investments:st, log_Revenue:Math.log1p(Math.abs(rev)),
+          log_Total_Assets:Math.log1p(ta), log_Num_Employees:Math.log1p(emp), Leverage:(debt+conv)/ta};
+}
+function scoreModel(m,feats){
+  let y=m.intercept; const contribs={};
+  for(const f of m.features){const z=(feats[f]-m.train_means[f])/m.train_sds[f];contribs[f]=m.coefficients[f]*z;y+=contribs[f];}
+  return {ratio:y, contribs};
+}
+
+const $=s=>document.querySelector(s);
+const fmt=(x,d=1)=>x.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+function tipCell(key,text){return `<td class="drv"><span class="tip">${text}<span class="tipbox">${TIPS[key]||""}</span></span></td>`;}
+
+function kpis(name,ratio,eur,usd,current){
+  const d=(ratio-current)*100, arrow=d>0?"\u25b2":(d<0?"\u25bc":"\u2014");
+  return `<div class="kpis">
+    <div class="kpi primary"><div class="lbl">${name} \u00b7 Cash Ratio</div>
+      <div class="val">${fmt(ratio*100)}<span class="u">%</span></div>
+      <span class="chip">${arrow} ${fmt(Math.abs(d))} pp vs current</span>
+      <div class="sub">forecast year &middot; Cash / Total Assets</div></div>
+    <div class="kpi"><div class="lbl">Cash Holding \u00b7 EUR</div>
+      <div class="val">\u20ac${fmt(eur)}<span class="u">m</span></div>
+      <div class="sub">= ratio &times; forecast-year assets</div></div>
+    <div class="kpi"><div class="lbl">Cash Holding \u00b7 USD</div>
+      <div class="val">$${fmt(usd)}<span class="u">m</span></div>
+      <div class="sub">peer panel currency</div></div></div>`;
+}
+function gauge(ratio,current,peer){
+  const cx=160,cy=168,R=120,SC=.60,
+        ang=f=>180*(1-Math.max(0,Math.min(1,f/SC))),
+        pt=(a,m=1)=>{const t=a*Math.PI/180;return [cx+R*m*Math.cos(t),cy-R*m*Math.sin(t)];};
+  const [lx,ly]=pt(180),[rx,ry]=pt(0),[vx,vy]=pt(ang(ratio));
+  const frac=Math.max(0,Math.min(1,ratio/SC));
+  const [px1,py1]=pt(ang(peer),.88),[px2,py2]=pt(ang(peer),1.06),[plx,ply]=pt(ang(peer),1.20);
+  const [cx1,cy1]=pt(ang(current),.74),[cx2,cy2]=pt(ang(current),.90),[clx,cly]=pt(ang(current),.62);
+  return `<svg viewBox="0 0 320 212" style="max-width:330px;margin:0 auto">
+    <defs><linearGradient id="ggrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1ab5cc"/><stop offset="1" stop-color="#1668bd"/></linearGradient></defs>
+    <path d="M ${lx} ${ly} A ${R} ${R} 0 0 1 ${rx} ${ry}" class="g-track"/>
+    <path d="M ${lx} ${ly} A ${R} ${R} 0 0 1 ${rx} ${ry}" class="g-val" pathLength="100"
+      stroke-dasharray="100" stroke-dashoffset="${100-frac*100}"/>
+    <line x1="${px1.toFixed(1)}" y1="${py1.toFixed(1)}" x2="${px2.toFixed(1)}" y2="${py2.toFixed(1)}" class="g-peer"/>
+    <text x="${plx.toFixed(1)}" y="${ply.toFixed(1)}" class="g-peerlbl">peer ${(peer*100).toFixed(0)}%</text>
+    <line x1="${cx1.toFixed(1)}" y1="${cy1.toFixed(1)}" x2="${cx2.toFixed(1)}" y2="${cy2.toFixed(1)}" class="g-cur"/>
+    <text x="${clx.toFixed(1)}" y="${cly.toFixed(1)}" class="g-curlbl">now ${(current*100).toFixed(0)}%</text>
+    <circle cx="${vx.toFixed(1)}" cy="${vy.toFixed(1)}" r="7" class="g-dot"/>
+    <text x="${cx}" y="${cy-18}" class="g-value">${fmt(ratio*100)}%</text>
+    <text x="${cx}" y="${cy+2}" class="g-vlabel">peer-implied cash ratio</text>
+    <text x="${lx}" y="${ly+18}" class="g-scale" text-anchor="middle">0%</text>
+    <text x="${rx}" y="${ry+18}" class="g-scale" text-anchor="middle">60%</text></svg>`;
+}
+function waterfall(m,contribs,ratio,tafEur){
+  const steps=[{name:"Baseline",eur:m.intercept*tafEur,pp:m.intercept*100,kind:"base"}];
+  for(const f of m.features) steps.push({name:SHORT[f],eur:contribs[f]*tafEur,pp:contribs[f]*100,kind:"delta"});
+  steps.push({name:"Cash holding",eur:ratio*tafEur,pp:ratio*100,kind:"final"});
+  const n=steps.length,W=680,H=300,padL=44,padR=14,padT=30,padB=46,
+        plotW=W-padL-padR,plotH=H-padT-padB,slot=plotW/n,bw=Math.min(58,slot*.56);
+  const cum=[];let run=0;
+  for(const s of steps){if(s.kind==="base")run=s.eur;else if(s.kind==="delta")run+=s.eur;cum.push(s.kind==="final"?s.eur:run);}
+  const ymax=Math.max(...cum,steps[0].eur,steps[n-1].eur)*1.18;
+  const Y=v=>padT+plotH*(1-v/ymax),Xc=i=>padL+slot*i+slot/2;
+  let p=`<svg viewBox="0 0 ${W} ${H}">`;
+  const stepSize=ymax>900?200:100;
+  for(let g=stepSize;g<ymax;g+=stepSize){
+    p+=`<line x1="${padL}" y1="${Y(g).toFixed(1)}" x2="${W-padR}" y2="${Y(g).toFixed(1)}" class="wf-grid"/>
+        <text x="${padL-6}" y="${(Y(g)+3).toFixed(1)}" class="wf-gridlbl">${g}</text>`;}
+  p+=`<line x1="${padL}" y1="${Y(0).toFixed(1)}" x2="${W-padR}" y2="${Y(0).toFixed(1)}" class="wf-axis"/>`;
+  let prev=0;
+  steps.forEach((s,i)=>{
+    const x=Xc(i)-bw/2;let top,bot,cls,lbl;
+    if(s.kind==="base"){top=s.eur;bot=0;cls="wf-base";lbl=`\u20ac${s.eur.toFixed(0)}`;prev=s.eur;}
+    else if(s.kind==="final"){top=s.eur;bot=0;cls="wf-final";lbl=`\u20ac${s.eur.toFixed(0)}`;}
+    else{const nr=prev+s.eur;top=Math.max(prev,nr);bot=Math.min(prev,nr);
+      cls=s.eur>=0?"wf-pos":"wf-neg";lbl=`${s.eur>=0?"+":"\u2212"}\u20ac${Math.abs(s.eur).toFixed(0)}`;prev=nr;}
+    const y=Y(top),h=Math.max(2,Y(bot)-Y(top));
+    p+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="2.5" class="wf-bar ${cls}"/>
+        <text x="${Xc(i).toFixed(1)}" y="${(y-14).toFixed(1)}" class="wf-val ${cls}-t">${lbl}</text>
+        <text x="${Xc(i).toFixed(1)}" y="${(y-5).toFixed(1)}" class="wf-valpp">${s.kind==="delta"?(s.pp>=0?"+":"")+s.pp.toFixed(2):s.pp.toFixed(1)}pp</text>
+        <text x="${Xc(i).toFixed(1)}" y="${H-26}" class="wf-cat">${s.name}</text>`;
+    if(i<n-1){const yc=Y(cum[i]);
+      p+=`<line x1="${(Xc(i)+bw/2).toFixed(1)}" y1="${yc.toFixed(1)}" x2="${(Xc(i+1)-bw/2).toFixed(1)}" y2="${yc.toFixed(1)}" class="wf-conn"/>`;}
+  });
+  p+=`<text x="${padL}" y="14" class="wf-unit">EUR m of forecast-year cash holding (pp of cash ratio below)</text></svg>`;
+  return p;
+}
+function driversTable(m,feats){
+  let rows="";
+  for(const f of m.features){
+    const v=feats[f];let shown=fmt(v,4);
+    if(PCT.has(f)) shown+=` <span class="pct">(${fmt(v*100)}%)</span>`;
+    rows+=`<tr>${tipCell(f,LABELS[f])}<td class="dim">${FORMULAS[f]}</td><td class="num">${shown}</td></tr>`;
+  }
+  return `<div class="twrap"><table class="t"><thead><tr><th>Model driver</th>
+    <th>Definition</th><th class="num">Value</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function legendWf(){
+  return `<div class="legend"><span><i style="background:#0d3a66"></i>Baseline (intercept)</span>
+    <span><i style="background:#1d8a5b"></i>Raises the holding</span>
+    <span><i style="background:#c2492f"></i>Lowers the holding</span>
+    <span><i style="background:#1668bd"></i>Predicted cash holding</span></div>`;
+}
+function modelPane(name,m,feats,fx,tafEur,footnote){
+  const r=scoreModel(m,feats);
+  const eur=r.ratio*tafEur, usd=eur*fx;
+  return kpis(name,r.ratio,eur,usd,feats.Cash_Ratio)
+    + `<div class="stitle">From baseline to cash holding \u2014 driver impact</div>
+       <div class="chartcard">${waterfall(m,r.contribs,r.ratio,tafEur)}${legendWf()}</div>`
+    + `<div class="grid2" style="margin-top:2px"><div><div class="stitle">Cash ratio gauge</div>
+        <div class="chartcard" style="display:flex;align-items:center;justify-content:center;min-height:212px">
+        ${gauge(r.ratio,feats.Cash_Ratio,PEER_MEDIAN)}</div></div>
+       <div><div class="stitle">Model drivers (USD basis)</div>${driversTable(m,feats)}</div></div>`
+    + `<div class="foot">${m.label}. ${footnote}</div>`;
+}
+
+function footballField(eurStruct,eurPers,cashEntered){
+  const rows=[
+    {label:"Method 1 \u00b7 Theory", sub:"Opler; Brown\u2013Petersen; Jensen", kind:"m1"},
+    {label:"Method 2 \u00b7 DCF / rNPV", sub:"three-bucket precautionary target", kind:"m2"},
+    {label:"Method 3 \u00b7 Structural", sub:"excl. Cash_Ratio \u00b7 paper primary", kind:"ml",
+     ci:ML_REF.struct.ci, dyn:eurStruct, dynlbl:"Structural model estimate"},
+    {label:"Method 3 \u00b7 Persistence", sub:"incl. Cash_Ratio \u00b7 robustness", kind:"ml",
+     ci:ML_REF.pers.ci, dyn:eurPers, dynlbl:"Persistence model estimate"},
+  ];
+  const W=760,rowH=68,padL=200,padR=24,padT=46,padB=40,H=padT+rowH*rows.length+padB,
+        xmin=300,xmax=950, X=v=>padL+(Math.min(Math.max(v,xmin),xmax)-xmin)/(xmax-xmin)*(W-padL-padR);
+  let p=`<svg viewBox="0 0 ${W} ${H}">
+    <defs><linearGradient id="ffgrad" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#1ab5cc"/><stop offset="1" stop-color="#1668bd"/></linearGradient></defs>`;
+  const c1=X(COMBINED[0]),c2=X(COMBINED[1]);
+  p+=`<rect x="${c1.toFixed(1)}" y="${padT-22}" width="${(c2-c1).toFixed(1)}" height="${H-padT-padB+22}" class="ff-band"/>
+      <text x="${((c1+c2)/2).toFixed(1)}" y="${padT-28}" class="ff-bandlbl">combined range \u20ac430\u2013610m</text>`;
+  for(let g=300;g<=950;g+=100){const xx=X(g);
+    p+=`<line x1="${xx.toFixed(1)}" y1="${padT-14}" x2="${xx.toFixed(1)}" y2="${H-padB+6}" class="ff-grid"/>
+        <text x="${xx.toFixed(1)}" y="${H-padB+22}" class="ff-axis">${g}</text>`;}
+  p+=`<text x="${W-padR}" y="${H-padB+38}" class="ff-axisunit">EUR m</text>`;
+  rows.forEach((r,i)=>{
+    const y=padT+i*rowH+rowH/2;
+    p+=`<text x="${padL-14}" y="${(y-4).toFixed(1)}" class="ff-lbl">${r.label}</text>
+        <text x="${padL-14}" y="${(y+12).toFixed(1)}" class="ff-sub">${r.sub}</text>`;
+    if(r.kind==="m1"){
+      const x1=X(METHOD1.lo),x2=X(METHOD1.hi);
+      p+=`<rect x="${x1.toFixed(1)}" y="${(y-11).toFixed(1)}" width="${(x2-x1).toFixed(1)}" height="22" rx="6" class="ff-bar m1"/>
+          <text x="${((x1+x2)/2).toFixed(1)}" y="${(y-16).toFixed(1)}" class="ff-val">430\u2013500</text>`;
+      [[METHOD1.floor,"floor 370"],[METHOD1.ceiling,"ceiling 740"]].forEach(([v,l])=>{const xx=X(v);
+        p+=`<line x1="${xx.toFixed(1)}" y1="${(y-15).toFixed(1)}" x2="${xx.toFixed(1)}" y2="${(y+15).toFixed(1)}" class="ff-tick"/>
+            <text x="${xx.toFixed(1)}" y="${(y+28).toFixed(1)}" class="ff-ticklbl">${l}</text>`;});
+    }else if(r.kind==="m2"){
+      const x1=X(METHOD2.lean),x2=X(METHOD2.conservative),xt=X(METHOD2.target),xm=X(METHOD2.ye);
+      p+=`<rect x="${x1.toFixed(1)}" y="${(y-11).toFixed(1)}" width="${(x2-x1).toFixed(1)}" height="22" rx="6" class="ff-bar m2"/>
+          <text x="${(x2+6).toFixed(1)}" y="${(y+4).toFixed(1)}" class="ff-rangelbl">361\u2013892</text>
+          <path d="M ${xt.toFixed(1)} ${(y-13).toFixed(1)} l 9 13 l -9 13 l -9 -13 Z" class="ff-diamond"/>
+          <text x="${xt.toFixed(1)}" y="${(y-18).toFixed(1)}" class="ff-val">target 467</text>
+          <line x1="${xm.toFixed(1)}" y1="${(y-15).toFixed(1)}" x2="${xm.toFixed(1)}" y2="${(y+15).toFixed(1)}" class="ff-tick red"/>
+          <text x="${xm.toFixed(1)}" y="${(y+28).toFixed(1)}" class="ff-ticklbl red">YE26E 389</text>`;
+    }else{
+      const x1=X(r.ci[0]),x2=X(r.ci[1]);
+      p+=`<rect x="${x1.toFixed(1)}" y="${(y-11).toFixed(1)}" width="${(x2-x1).toFixed(1)}" height="22" rx="6" class="ff-bar ml"/>
+          <text x="${((x1+x2)/2).toFixed(1)}" y="${(y+28).toFixed(1)}" class="ff-ticklbl">paper 80% CI</text>`;
+      const xd=X(r.dyn);
+      p+=`<circle cx="${xd.toFixed(1)}" cy="${y.toFixed(1)}" r="8" class="ff-dot"/>
+          <text x="${xd.toFixed(1)}" y="${(y-16).toFixed(1)}" class="ff-val blue">${r.dynlbl} \u20ac${r.dyn.toFixed(0)}m</text>`;
+    }
+  });
+  if(cashEntered!=null){const xc=X(cashEntered);
+    p+=`<line x1="${xc.toFixed(1)}" y1="${padT-22}" x2="${xc.toFixed(1)}" y2="${H-padB+6}" class="ff-current"/>
+        <text x="${xc.toFixed(1)}" y="${padT-6}" class="ff-currentlbl">cash entered \u20ac${cashEntered.toFixed(0)}m</text>`;}
+  return p+"</svg>";
+}
+function triPane(eurStruct,eurPers,cashEntered){
+  return `<div class="stitle">Optimal cash across the three methods (EUR m)</div>
+    <div class="chartcard">${footballField(eurStruct,eurPers,cashEntered)}
+    <div class="legend">
+      <span><i style="background:#7d97b0"></i>Method 1 theory range</span>
+      <span><i style="background:#0d3a66"></i>Method 2 DCF policy range</span>
+      <span><i style="background:#bcd9e8"></i>ML paper 80% CI (reference)</span>
+      <span><i style="background:#1668bd;border-radius:50%"></i>Live model estimate</span>
+      <span><i style="background:#c2492f;width:3px"></i>Cash entered</span></div></div>
+    <div class="note">Method 1 and Method 2 are static figures from the paper (Table 1; Table 2 and Figure 10):
+    theory range \u20ac430\u2013500m with a \u20ac370m hard floor and \u20ac740m soft ceiling; DCF base target \u20ac467m
+    within a \u20ac361\u2013892m policy range, against modelled YE2026 cash of \u20ac389m. The two model rows update live
+    with your inputs. Shaded CI bands are the paper's bootstrap intervals for the 2025 reference inputs and do not
+    recompute. Background shading marks the combined defensible range of \u20ac430\u2013610m (Section 8.2).</div>`;
+}
+
+function buildFields(){
+  let h="";
+  for(const g of GROUPS){
+    const badge=g.note?`<span class="badge">${g.note}</span>`:"";
+    h+=`<details class="sect"${g.open?" open":""}><summary>${g.title}${badge}
+      <svg class="chev" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </summary><div class="body">`;
+    let i=0;
+    while(i<g.fields.length){
+      const f=g.fields[i];
+      if(f.dualWith && g.fields[i+1] && g.fields[i+1].id===f.dualWith){
+        const f2=g.fields[i+1];
+        h+=`<div class="field dual"><div><label for="in-${f.id}">${f.label}</label>
+            <input id="in-${f.id}" type="number" step="any" value="${f.def}"></div>
+            <div><label for="in-${f2.id}">${f2.label}</label>
+            <input id="in-${f2.id}" type="number" step="any" value="${f2.def}"></div></div>`;
+        i+=2;
+      }else{
+        h+=`<div class="field"><label for="in-${f.id}">${f.label}</label>
+            <input id="in-${f.id}" type="number" step="any" value="${f.def}"></div>`;
+        i+=1;
+      }
+    }
+    h+=`</div></details>`;
+  }
+  $("#fields").innerHTML=h;
+}
+function readInputs(){
+  const v={};
+  for(const f of INPUTS){const x=parseFloat($("#in-"+f.id).value);v[f.id]=isFinite(x)?x:NaN;}
+  return v;
+}
+function validate(v){
+  const e=[];
+  if(!(v.ta>0)) e.push("Feature-year Total Assets must be greater than 0.");
+  if(!(v.taf>0)) e.push("Forecast-year Total Assets must be greater than 0.");
+  if(!(v.rev>0)) e.push("Revenue must be greater than 0.");
+  if(!(v.cash>=0)) e.push("Cash & Equivalents cannot be negative.");
+  if(!(v.fx>0)) e.push("FX rate must be greater than 0.");
+  for(const k of ["rd","ni","stinv","debt","conv","emp"]) if(!isFinite(v[k])) e.push("All fields need a number.");
+  return e;
+}
+function render(){
+  const v=readInputs(), errs=validate(v);
+  if(errs.length){
+    const w=`<div class="warnbox"><b>Please review the inputs</b>${[...new Set(errs)].join("<br>")}</div>`;
+    ["p1","p2","p3"].forEach(id=>$("#"+id).innerHTML=w); return;
+  }
+  const feats=deriveFeatures(v), fx=v.fx, tafEur=v.taf;
+  const sp=scoreModel(PERSISTENCE,feats), ss=scoreModel(STRUCTURAL,feats);
+  const eurP=sp.ratio*tafEur, eurS=ss.ratio*tafEur;
+  $("#p1").innerHTML=modelPane("Persistence",PERSISTENCE,feats,fx,tafEur,
+    "Robustness specification (Table 6: 38.5% / \u20ac772.2m on the paper reference case). Verified to reproduce the "
+    +"R analysis exactly. Cash holding = predicted ratio \u00d7 forecast-year total assets. Point estimate only.");
+  $("#p2").innerHTML=modelPane("Structural",STRUCTURAL,feats,fx,tafEur,
+    "Primary business benchmark: the re-estimated 8-feature Lasso without the cash-ratio term (Table 6: 30.4% / "
+    +"\u20ac609.3m / $630.8m on the paper reference case). Cash holding = predicted ratio \u00d7 forecast-year total assets. Point estimate only.");
+  $("#p3").innerHTML=triPane(eurS,eurP,v.cash);
+}
+let raf=null;
+function scheduleRender(){if(raf)cancelAnimationFrame(raf);raf=requestAnimationFrame(render);}
+
+function boot(){
+  buildFields();
+  document.querySelectorAll(".tabbar button").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll(".tabbar button").forEach(x=>x.classList.remove("on"));
+    document.querySelectorAll(".pane").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");$("#"+b.dataset.pane).classList.add("on");
+  }));
+  $("#fields").addEventListener("input",scheduleRender);
+  $("#resetBtn").addEventListener("click",()=>{INPUTS.forEach(f=>$("#in-"+f.id).value=f.def);render();});
+  render();
+}
+(function(){
+  const PW="AscendisBlockbuster";
+  function open(){$("#gate").style.display="none";$("#app").style.visibility="visible";boot();}
+  if(sessionStorage.getItem("asc_auth")==="1"){open();return;}
+  const tryPw=()=>{ if($("#pw").value===PW){sessionStorage.setItem("asc_auth","1");open();}
+    else $("#pwerr").textContent="Incorrect password."; };
+  $("#pwbtn").addEventListener("click",tryPw);
+  $("#pw").addEventListener("keydown",e=>{if(e.key==="Enter")tryPw();});
+})();
+</script>
+</body>
+</html>
